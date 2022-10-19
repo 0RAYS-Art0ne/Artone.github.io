@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://boooook123.github.io/Artone.github.io/</id>
+    <title>Artone &apos;s Blog</title>
+    <updated>2022-10-19T09:08:53.046Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://boooook123.github.io/Artone.github.io/"/>
+    <link rel="self" href="https://boooook123.github.io/Artone.github.io/atom.xml"/>
+    <subtitle>一些细细的琐事。。</subtitle>
+    <logo>https://boooook123.github.io/Artone.github.io/images/avatar.png</logo>
+    <icon>https://boooook123.github.io/Artone.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2022, Artone &apos;s Blog</rights>
+    <entry>
+        <title type="html"><![CDATA[vscode+phpstudy动态调试环境]]></title>
+        <id>https://boooook123.github.io/Artone.github.io/post/vscodephpstudy-dong-tai-diao-shi-huan-jing/</id>
+        <link href="https://boooook123.github.io/Artone.github.io/post/vscodephpstudy-dong-tai-diao-shi-huan-jing/">
+        </link>
+        <updated>2022-10-19T08:56:37.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="准备工作">准备工作</h2>
+<p>phpstudy（直接官网下载就可以）<br>
+<a href="https://www.xp.cn/download.html">Windows版phpstudy下载 - 小皮面板(phpstudy) (xp.cn)</a><br>
+vscode（同样官网直接下）<br>
+https://code.visualstudio.com/</p>
+<h2 id="搭建">搭建</h2>
+<h4 id="第一步">第一步</h4>
+<p>打开vscode，先安装一下一些必要的插件<br>
+1.PHP Debug<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169822931.png" alt="" loading="lazy"><br>
+2.汉化包<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169831114.png" alt="" loading="lazy"><br>
+3.Code Runner<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169834739.png" alt="" loading="lazy"></p>
+<h4 id="第二步">第二步</h4>
+<p>安装好后打开phpstudy，找到php所在的路径<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169847282.png" alt="" loading="lazy"><br>
+将路径复制，写到系统的环境变量中，具体操作：<br>
+打开高级系统设置-&gt;环境变量-&gt;Path-&gt;新建<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169855325.png" alt="" loading="lazy"><br>
+配好后可以在cmd中输入</p>
+<pre><code>php -v
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://boooook123.github.io/Artone.github.io//post-images/1666169870770.png" alt="" loading="lazy"></figure>
+<h4 id="第三步">第三步</h4>
+<p>下载xdebug<br>
+先新建一个index.php,得到phpinfo的内容<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169909555.png" alt="" loading="lazy"><br>
+然后去https://xdebug.org/wizard，把phpinfo中的内容粘贴进去，可以得到适合的xdebug版本<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169992678.png" alt="" loading="lazy"><br>
+按照它的提示一步一步做：<br>
+将下载好的xdebug放到对应的目录下，并重命名<br>
+然后在php.ini的最下面写入相对应的配置，当然这并不是完整的[Xdebug]配置<br>
+还有一部分在vscode的PHPdebug中，如果装的是Xdebug3，则复制上面部分，Xdebug2则复制下面部分，这里主要是因为Xdebug从2版本到3版本做了一些替换<br>
+具体参照https://xdebug.org/docs/upgrade_guide</p>
+<p>以Xdebug3为例：<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170031758.png" alt="" loading="lazy"></p>
+<p>配置好后保存php.ini，并重启phpstudy的服务<br>
+打开phpinfo，搜索Xdebug，如果能看到Xdebug的标志，则说明到目前为止一切顺利<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170105239.png" alt="" loading="lazy"></p>
+<h4 id="第四步">第四步</h4>
+<p>用vscode打开一个文件夹，按F5进入调试，它会让我们创建一个launch.json,这里默认即可<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170118714.png" alt="" loading="lazy"><br>
+然后下一个断点，用浏览器访问你的php文件，最终success。（Ohhhhhhhhhh<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170134978.png" alt="" loading="lazy"></p>
+<h2 id="解决报错">解决报错</h2>
+<h4 id="问题一">问题一</h4>
+<p><img src="https://boooook123.github.io/Artone.github.io//post-images/1666170145850.png" alt="" loading="lazy"><br>
+出现如上报错，说明第三步从php debug中复制配置所对应的版本错了，如上就是Xdebug3却复制了Xdebug2的配置</p>
+<h4 id="问题二">问题二</h4>
+<p><img src="https://boooook123.github.io/Artone.github.io//post-images/1666170155427.png" alt="" loading="lazy"><br>
+这个问题主要因为Xdebug3中的 xdebug.start_with_request = yes 将 Xdebug 配置为在每个请求上建立连接，同时，官方文档提供使用 xdebug.start_with_request = trigger 以便仅在明确指出需要时连接 Xdebug。在这种情况下，我们可以通过 GET 参数传递一个额外的密钥来开始逐步调试过程，例如 http://localhost/?XDEBUG_TRIGGER=1，但很不方便。<br>
+解决方法就是在php.ini的配置中加入</p>
+<pre><code>xdebug.discover_client_host = yes
+xdebug.log_level = 0
+</code></pre>
+<h4 id="问题三">问题三</h4>
+<p>端口被占用，这种情况建议在使用这个端口（默认是9000-9003）之前可以在phpstudy中检查一下端口是否已经被占用<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170170363.png" alt="" loading="lazy"></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[全新的开始]]></title>
+        <id>https://boooook123.github.io/Artone.github.io/post/quan-xin-de-kai-shi/</id>
+        <link href="https://boooook123.github.io/Artone.github.io/post/quan-xin-de-kai-shi/">
+        </link>
+        <updated>2022-10-19T00:47:07.000Z</updated>
+        <summary type="html"><![CDATA[<p>服务器到期了，之前买的域名也到期了。。。<br>
+于是乎<br>
+全新的域名，全新的博客，又是一个全新的开始<br>
+github page + Gridea，完美解决服务器续费如勒索的困扰(狂喜.jpg)</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>服务器到期了，之前买的域名也到期了。。。<br>
+于是乎<br>
+全新的域名，全新的博客，又是一个全新的开始<br>
+github page + Gridea，完美解决服务器续费如勒索的困扰(狂喜.jpg)</p>
+<!-- more -->
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Hello Gridea]]></title>
+        <id>https://boooook123.github.io/Artone.github.io/post/hello-gridea/</id>
+        <link href="https://boooook123.github.io/Artone.github.io/post/hello-gridea/">
+        </link>
+        <updated>2018-12-11T16:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
+✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
+✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
+<!-- more -->
+<p><a href="https://github.com/getgridea/gridea">Github</a><br>
+<a href="https://gridea.dev/">Gridea 主页</a><br>
+<a href="https://fehey.com/">示例网站</a></p>
+<h2 id="特性">特性👇</h2>
+<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
+<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
+<p>🏷️  你可以对文章进行标签分组</p>
+<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
+<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
+<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
+<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
+<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
+<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
+<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
+<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
+<p>未来，它一定会成为你离不开的伙伴</p>
+<p>尽情发挥你的才华吧！</p>
+<p>😘 Enjoy~</p>
+]]></content>
+    </entry>
+</feed>
