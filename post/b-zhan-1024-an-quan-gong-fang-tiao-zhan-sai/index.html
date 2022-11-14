@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>b站1024安全攻防挑战赛 | Artone &#39;s Blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://boooook123.github.io/Artone.github.io//favicon.ico?v=1668409090686">
+<link rel="stylesheet" href="https://boooook123.github.io/Artone.github.io//styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="第一次参加b站的1024挑战赛，前几天都摸了，最后几天被队友拉着强行上号，没想到最后ak了！！（只能说趟的很舒服）
+
+
+题目三
+流量题，很明显是在和behind.php做交互，也就是一个后门文件
+传输的数据都进行了加密，这里payload ..." />
+    <meta name="keywords" content="MISC,流量取证,冰蝎,Grafana,CTF,WEB" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://boooook123.github.io/Artone.github.io/">
+        <img src="https://boooook123.github.io/Artone.github.io//images/avatar.png?v=1668409090686" class="site-logo">
+        <h1 class="site-title">Artone &#39;s Blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      一些细细的琐事。。
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://boooook123.github.io/Artone.github.io//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">b站1024安全攻防挑战赛</h2>
+            <div class="post-date">2022-11-08</div>
+            
+            <div class="post-content" v-pre>
+              <p>第一次参加b站的1024挑战赛，前几天都摸了，最后几天被队友拉着强行上号，没想到最后ak了！！（只能说趟的很舒服）<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1667889766807.png" alt="" loading="lazy"></p>
+<!-- more -->
+<h2 id="题目三">题目三</h2>
+<p>流量题，很明显是在和behind.php做交互，也就是一个后门文件</p>
+<p>传输的数据都进行了加密，这里payload 熵很大，Content-type 还是 appliacation/x-www-form-urlencoded，很有可能是冰蝎流量</p>
+<p>但是，所有的流量中并没有发现key，如果是AES加密的，是无法解的，所有大概率是用了XOR加密</p>
+<p>检测以及计算key值</p>
+<pre><code class="language-python">from base64 import b64decode
+
+phrases = [
+    &quot;assert|eval(base64_decode('&quot;.encode(),
+    b'&lt;?\n@error_reporting(0);\n\nfunctio',
+    b'&lt;?\nfunction main($action, $remot',
+    b'&lt;?\n@error_reporting(0);\nset_time',
+    b'\nerror_reporting(0);\n\nfunction m',
+    b'&lt;?\n@error_reporting(0);\n\n\nfuncti',
+    b'&lt;?\nerror_reporting(0);\nfunction ',
+    b'@error_reporting(0);\nfunction ma',
+    b'&lt;?php\n\n$taskResult = array();\n$p',
+    b&quot;&lt;?\nerror_reporting(0);\nheader('C&quot;,
+    b'@error_reporting(0);\n\nfunction g',
+    b'&lt;?\n@error_reporting(0);\n@set_tim',
+  	b'@error_reporting',
+]
+
+
+def xor(l0, l1):
+    ret = [chr(ord(chr(a)) ^ ord(chr(b))) for a, b in zip(l0, l1)]
+    return &quot;&quot;.join(ret)
+
+
+def check(cipher):
+    cipher = b64decode(cipher)
+    for phrase in phrases:
+        p0 = phrase[0:16]
+        print(p0)
+        p1 = phrase[16:]
+
+        c0 = cipher[0:16]
+        print(c0)
+        c1 = cipher[16:16 + len(p1)]
+
+        k0 = xor(p0, c0)
+        print(k0)
+        k1 = xor(p1, c1)
+        # print(k1)
+
+        if k1 in k0:
+            return k0
+    return None
+
+
+cipher = &quot;...&quot;
+
+key = check(cipher)
+if key:
+    print(&quot;[+]&quot;, cipher[:32], &quot;is XOR Behinder Request!&quot;)
+    print(&quot;[+] The Key of Behinder is &quot;, key)
+else:
+    print(&quot;[-]&quot;, cipher[:32], &quot;not Behinder Request..&quot;)
+</code></pre>
+<p>将密文与几个常见的特征头比对<br>
+拿到key=flag3{Beh1_nder}<br>
+用key可以解码加密数据得到传输的明文</p>
+<p>exp:</p>
+<pre><code class="language-python">from base64 import b64decode
+def xor(l0, l1):
+    ret = [chr(ord(chr(a)) ^ ord(chr(b))) for a, b in zip(l0, l1)]
+    return &quot;&quot;.join(ret)
+cipher = &quot;...&quot;
+cipher = b64decode(cipher)
+k0 = b'flag3{Beh1_nder}'
+ans = &quot;&quot;
+for i in range(100):
+    c0 = cipher[16*i:16*(i+1)]
+    p0 = xor(k0, c0)
+    ans += p0
+    print(p0)
+print(ans)
+</code></pre>
+<h2 id="题目五">题目五</h2>
+<p>进入网站后有一个msg的提示</p>
+<pre><code>/etc/server.go
+</code></pre>
+<p>用fscan扫一下端口</p>
+<pre><code>[*] WebTitle:http://101.132.189.74     code:404 len:18     title:None
+[*] WebTitle:http://101.132.189.74:8082 code:200 len:3024   title:JFrog
+[*] WebTitle:http://101.132.189.74:8081 code:200 len:878    title:None
+[*] WebTitle:http://101.132.189.74:8088 code:302 len:29     title:None 跳转url: http://101.132.189.74:8088/login
+[*] WebTitle:http://101.132.189.74:8088/login code:200 len:27707  title:Grafana
+[+] InfoScan:http://101.132.189.74:8088/login [editor]
+</code></pre>
+<p>发现在8088端口有一个Grafana以及在8082端口有一个JFrog</p>
+<p>Grafana 8.0.0 - 8.3.0存在任意文件读取漏洞（CVE-2021-43798）</p>
+<p>所以可以尝试读取一下文件，成功读取到题目提示的server.go文件</p>
+<pre><code class="language-go">package server
+
+import (
+	&quot;fmt&quot;
+	&quot;github.com/andelf/go-curl&quot;
+	&quot;github.com/gin-gonic/gin&quot;
+	&quot;io&quot;
+	&quot;net&quot;
+	&quot;net/http&quot;
+	&quot;net/url&quot;
+	&quot;os&quot;
+	&quot;strings&quot;
+	&quot;crack5/utils/try&quot;
+)
+
+
+/*func Test(buf []byte, userdata interface{}) bool {
+	println(&quot;DEBUG: size=&gt;&quot;, len(buf))
+	println(&quot;DEBUG: content=&gt;&quot;, string(buf))
+	return true
+}*/
+
+func SecCheck(myurl string) bool {
+	if strings.Contains(myurl, &quot;@&quot;) || strings.Contains(myurl, &quot;./&quot;) {    //黑名单
+		return false
+	} else {
+		return true
+	}
+}
+
+func IsInternalIp(host string) bool {
+	ipaddr, err := net.ResolveIPAddr(&quot;ip&quot;, host)  //根据域名查ip
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(ipaddr.IP, ipaddr.Zone)
+
+	if ipaddr.IP.IsLoopback() { // 判断是否是还回地址 127.0.0.1
+		return true
+	}
+
+	ip4 := ipaddr.IP.To4() //转换为ipv4
+	if ip4 == nil {
+		return false
+	}
+	return ip4[0] == 10 ||
+		(ip4[0] == 172 &amp;&amp; ip4[1] &gt;= 16 &amp;&amp; ip4[1] &lt;= 31) ||
+		(ip4[0] == 169 &amp;&amp; ip4[1] == 254) ||
+		(ip4[0] == 192 &amp;&amp; ip4[1] == 168)
+}
+
+// 解决跨域问题
+func Cors() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		method := c.Request.Method
+
+		c.Header(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;)
+		c.Header(&quot;Access-Control-Allow-Headers&quot;, &quot;Content-Type,AccessToken,X-CSRF-Token, Authorization, Token&quot;)
+		c.Header(&quot;Access-Control-Allow-Methods&quot;, &quot;POST, GET, OPTIONS&quot;)
+		c.Header(&quot;Access-Control-Expose-Headers&quot;, &quot;Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type&quot;)
+		c.Header(&quot;Access-Control-Allow-Credentials&quot;, &quot;true&quot;)
+		if method == &quot;OPTIONS&quot; {
+			c.AbortWithStatus(http.StatusNoContent)
+		}
+		c.Next()
+	}
+}
+
+
+// GetData
+func GetData(c *gin.Context) {
+
+	try.Try(func(){
+		target, status := c.GetQuery(&quot;t&quot;)  //传参t
+
+		if !status {
+			c.JSON(http.StatusOK, gin.H{
+				&quot;msg&quot;:&quot;query invalid&quot;,
+			})
+			return
+		}
+		if len(target) &gt;= 128 || !SecCheck(target) {  //长度限制，黑名单限制
+			c.JSON(http.StatusBadRequest, gin.H{
+				&quot;msg&quot;:&quot;illage url&quot;,
+			})
+			return
+		}
+
+		u, err := url.Parse(target)  //解析
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{   //解析错误
+				&quot;msg&quot;:&quot;illage url&quot;,
+			})
+			return
+		} else {
+			if (u.Scheme != &quot;http&quot; &amp;&amp; u.Scheme != &quot;https&quot;) || IsInternalIp(u.Hostname()) {  //只接受http和https协议 ip检测
+				c.JSON(http.StatusBadRequest, gin.H{
+					&quot;msg&quot;:&quot;illage url&quot;,
+				})
+				return
+			}
+
+			easy := curl.EasyInit()
+			defer easy.Cleanup()
+			easy.Setopt(curl.OPT_URL, target)
+			easy.Setopt(curl.OPT_TIMEOUT, 3)
+			easy.Setopt(curl.OPT_FOLLOWLOCATION, false)
+			easy.Setopt(curl.OPT_WRITEFUNCTION, func (buf []byte, extra interface{}) bool {
+				c.Data(http.StatusOK, &quot;text/html&quot;, buf)
+				return true
+			})
+			err := easy.Perform()
+			if err != nil {
+				fmt.Printf(&quot;ERROR: %v\n&quot;, err)
+				return
+			} else {
+				c.JSON(http.StatusInternalServerError, nil)
+				return
+			}
+		}
+	}).Catch(func() {
+		c.JSON(http.StatusBadGateway, nil)
+		return
+	})
+
+}
+
+func Info(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		&quot;msg&quot;:&quot; /etc/server.go&quot;,
+	})
+	return
+}
+
+
+//
+func LoadUrl(r *gin.Engine) {
+
+	r.Use(Cors())
+	r.GET(&quot;/get&quot;, GetData)
+	r.GET(&quot;/index&quot;, Info)
+}
+
+
+func RunAdmin() http.Handler {
+	gin.DisableConsoleColor()
+
+	f, _ := os.Create(&quot;./logs/server.log&quot;)
+	gin.DefaultWriter = io.MultiWriter(f)
+
+
+	r := gin.Default()
+
+	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		return fmt.Sprintf(&quot;[Crack5-Web] %s - [%s] \&quot;%s %s %s %d %s \&quot;%s\&quot; %s\&quot;\n&quot;,
+			param.ClientIP,
+			param.TimeStamp.Format(&quot;2006-01-02 15:04:05&quot;),
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+			param.StatusCode,
+			param.Latency,
+			param.Request.UserAgent(),
+			param.ErrorMessage,
+		)
+	}))
+	r.Use(gin.Recovery())
+
+	LoadUrl(r)
+
+	return r
+}
+</code></pre>
+<p>在get路由下传参t，并解析，curl发起一个对话</p>
+<p>也就是说，填入一个url后，该网站可以实现跨站访问，看一下里面的两个waf</p>
+<pre><code class="language-go">if (u.Scheme != &quot;http&quot; &amp;&amp; u.Scheme != &quot;https&quot;) || IsInternalIp(u.Hostname()) {  //只接受http和https协议 ip检测
+				c.JSON(http.StatusBadRequest, gin.H{
+					&quot;msg&quot;:&quot;illage url&quot;,
+				})
+				return
+</code></pre>
+<p>以及</p>
+<pre><code class="language-go">func IsInternalIp(host string) bool {
+	ipaddr, err := net.ResolveIPAddr(&quot;ip&quot;, host)  //根据域名查ip
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(ipaddr.IP, ipaddr.Zone)
+
+	if ipaddr.IP.IsLoopback() { // 判断是否是还回地址
+		return true
+	}
+
+	ip4 := ipaddr.IP.To4() //转换为ipv4
+	if ip4 == nil {
+		return false
+	}
+	return ip4[0] == 10 ||
+		(ip4[0] == 172 &amp;&amp; ip4[1] &gt;= 16 &amp;&amp; ip4[1] &lt;= 31) ||
+		(ip4[0] == 169 &amp;&amp; ip4[1] == 254) ||
+		(ip4[0] == 192 &amp;&amp; ip4[1] == 168)
+}
+</code></pre>
+<p>必须是http或者https开头，地址的ip不能是还回地址，也就是127.0.0.1，然后对整个ipv4也做了一些限制</p>
+<p>由于这里存在ResolveIPAddr()方法，输入的域名会被解析，所以短ip的方式也难以绕过，十进制等ip转换也会被解码</p>
+<p>但是这是有一个绝佳方案</p>
+<pre><code>http://0.0.0.0
+</code></pre>
+<p>指代本机的所有ip，自然也包括127.0.0.1</p>
+<p>我们的目的是根据已有提示去打9200端口</p>
+<pre><code>{
+  &quot;name&quot; : &quot;ali-sh-sec-ctf-25aaa86-01&quot;,
+  &quot;cluster_name&quot; : &quot;elasticsearch&quot;,
+  &quot;cluster_uuid&quot; : &quot;ikcj8ysFR2KnnTa5chqvUA&quot;,
+  &quot;version&quot; : {
+    &quot;number&quot; : &quot;7.17.6&quot;,
+    &quot;build_flavor&quot; : &quot;default&quot;,
+    &quot;build_type&quot; : &quot;deb&quot;,
+    &quot;build_hash&quot; : &quot;f65e9d338dc1d07b642e14a27f338990148ee5b6&quot;,
+    &quot;build_date&quot; : &quot;2022-08-23T11:08:48.893373482Z&quot;,
+    &quot;build_snapshot&quot; : false,
+    &quot;lucene_version&quot; : &quot;8.11.1&quot;,
+    &quot;minimum_wire_compatibility_version&quot; : &quot;6.8.0&quot;,
+    &quot;minimum_index_compatibility_version&quot; : &quot;6.0.0-beta1&quot;
+  },
+  &quot;tagline&quot; : &quot;You Know, for Search&quot;
+}
+</code></pre>
+<p>发现是一个elasticsearch的未授权访问</p>
+<p>直接查询所有的index和type</p>
+<pre><code>_search?pretty=true 
+</code></pre>
+<p>得到用户名和密码</p>
+<pre><code>&quot;hits&quot; : {
+    &quot;total&quot; : {
+      &quot;value&quot; : 1,
+      &quot;relation&quot; : &quot;eq&quot;
+    },
+    &quot;max_score&quot; : 1.0,
+    &quot;hits&quot; : [
+      {
+        &quot;_index&quot; : &quot;bilibili-1024&quot;,
+        &quot;_type&quot; : &quot;_doc&quot;,
+        &quot;_id&quot; : &quot;2eSE84MBoy7sRgaelu2S&quot;,
+        &quot;_score&quot; : 1.0,
+        &quot;_source&quot; : {
+          &quot;username&quot; : &quot;ctfer&quot;,
+          &quot;passwd&quot; : &quot;1qaz@WSX&quot;,
+          &quot;ttl&quot; : &quot;false&quot;,
+          &quot;msg&quot; : &quot;good luck ctfer&quot;
+        }
+      }
+</code></pre>
+<p>登入JFrog后台，在后台直接搜ssh，就能找到连接ssh的用户名和密码，连接后cat flag即可</p>
+<h3 id="关于elasticsearch">关于elasticsearch</h3>
+<p><a href="https://blog.51cto.com/feelmanc/1250430">elasticsearch的基本用法_feelManc的技术博客_51CTO博客</a></p>
+<p><a href="https://so.csdn.net/so/search?q=Elasticsearch&amp;spm=1001.2101.3001.7020">Elasticsearch</a>是一款java编写的企业级搜索服务。越来越多的公司使用ELK作为日志分析，启动此服务默认会开放9200端口或者9300端口，可被非法操作数据</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/_7s7Vrkzq/" class="tag">
+                    MISC
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/1gSyFnTeaS/" class="tag">
+                    流量取证
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/jh23o7n0t9/" class="tag">
+                    冰蝎
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/Av_PinxEy5/" class="tag">
+                    Grafana
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/gh05R7cM0/" class="tag">
+                    CTF
+                  </a>
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/3cJUATMNRB/" class="tag">
+                    WEB
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://boooook123.github.io/Artone.github.io/post/ji-liang-dao-qiang-wang-ni-tai-de-web/">
+                  <h3 class="post-title">
+                    记两道强网拟态的web
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>

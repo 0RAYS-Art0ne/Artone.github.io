@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>vscode+phpstudy动态调试环境 | Artone &#39;s Blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://boooook123.github.io/Artone.github.io//favicon.ico?v=1668409090686">
+<link rel="stylesheet" href="https://boooook123.github.io/Artone.github.io//styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="小白的cnvd之旅（一）：搭建环境
+
+准备工作
+phpstudy（直接官网下载就可以）
+Windows版phpstudy下载 - 小皮面板(phpstudy) (xp.cn)
+vscode（同样官网直接下）
+https://code.vis..." />
+    <meta name="keywords" content="代码审计" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://boooook123.github.io/Artone.github.io/">
+        <img src="https://boooook123.github.io/Artone.github.io//images/avatar.png?v=1668409090686" class="site-logo">
+        <h1 class="site-title">Artone &#39;s Blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      一些细细的琐事。。
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://boooook123.github.io/Artone.github.io//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">vscode+phpstudy动态调试环境</h2>
+            <div class="post-date">2022-10-19</div>
+            
+            <div class="post-content" v-pre>
+              <p>小白的cnvd之旅（一）：搭建环境</p>
+<!-- more -->
+<h2 id="准备工作">准备工作</h2>
+<p>phpstudy（直接官网下载就可以）<br>
+<a href="https://www.xp.cn/download.html">Windows版phpstudy下载 - 小皮面板(phpstudy) (xp.cn)</a><br>
+vscode（同样官网直接下）<br>
+https://code.visualstudio.com/</p>
+<h2 id="搭建">搭建</h2>
+<h4 id="第一步">第一步</h4>
+<p>打开vscode，先安装一下一些必要的插件<br>
+1.PHP Debug<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169822931.png" alt="" loading="lazy"><br>
+2.汉化包<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169831114.png" alt="" loading="lazy"><br>
+3.Code Runner<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169834739.png" alt="" loading="lazy"></p>
+<h4 id="第二步">第二步</h4>
+<p>安装好后打开phpstudy，找到php所在的路径<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169847282.png" alt="" loading="lazy"><br>
+将路径复制，写到系统的环境变量中，具体操作：<br>
+打开高级系统设置-&gt;环境变量-&gt;Path-&gt;新建<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169855325.png" alt="" loading="lazy"><br>
+配好后可以在cmd中输入</p>
+<pre><code>php -v
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://boooook123.github.io/Artone.github.io//post-images/1666169870770.png" alt="" loading="lazy"></figure>
+<h4 id="第三步">第三步</h4>
+<p>下载xdebug<br>
+先新建一个index.php,得到phpinfo的内容<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169909555.png" alt="" loading="lazy"><br>
+然后去https://xdebug.org/wizard，把phpinfo中的内容粘贴进去，可以得到适合的xdebug版本<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666169992678.png" alt="" loading="lazy"><br>
+按照它的提示一步一步做：<br>
+将下载好的xdebug放到对应的目录下，并重命名<br>
+然后在php.ini的最下面写入相对应的配置，当然这并不是完整的[Xdebug]配置<br>
+还有一部分在vscode的PHPdebug中，如果装的是Xdebug3，则复制上面部分，Xdebug2则复制下面部分，这里主要是因为Xdebug从2版本到3版本做了一些替换<br>
+具体参照https://xdebug.org/docs/upgrade_guide</p>
+<p>以Xdebug3为例：<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170031758.png" alt="" loading="lazy"></p>
+<p>配置好后保存php.ini，并重启phpstudy的服务<br>
+打开phpinfo，搜索Xdebug，如果能看到Xdebug的标志，则说明到目前为止一切顺利<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170105239.png" alt="" loading="lazy"></p>
+<h4 id="第四步">第四步</h4>
+<p>用vscode打开一个文件夹，按F5进入调试，它会让我们创建一个launch.json,这里默认即可<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170118714.png" alt="" loading="lazy"><br>
+然后下一个断点，用浏览器访问你的php文件，最终success。（Ohhhhhhhhhh<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170134978.png" alt="" loading="lazy"></p>
+<h2 id="解决报错">解决报错</h2>
+<h4 id="问题一">问题一</h4>
+<p><img src="https://boooook123.github.io/Artone.github.io//post-images/1666170145850.png" alt="" loading="lazy"><br>
+出现如上报错，说明第三步从php debug中复制配置所对应的版本错了，如上就是Xdebug3却复制了Xdebug2的配置</p>
+<h4 id="问题二">问题二</h4>
+<p><img src="https://boooook123.github.io/Artone.github.io//post-images/1666170155427.png" alt="" loading="lazy"><br>
+这个问题主要因为Xdebug3中的 xdebug.start_with_request = yes 将 Xdebug 配置为在每个请求上建立连接，同时，官方文档提供使用 xdebug.start_with_request = trigger 以便仅在明确指出需要时连接 Xdebug。在这种情况下，我们可以通过 GET 参数传递一个额外的密钥来开始逐步调试过程，例如 http://localhost/?XDEBUG_TRIGGER=1，但很不方便。<br>
+解决方法就是在php.ini的配置中加入</p>
+<pre><code>xdebug.discover_client_host = yes
+xdebug.log_level = 0
+</code></pre>
+<h4 id="问题三">问题三</h4>
+<p>端口被占用，这种情况建议在使用这个端口（默认是9000-9003）之前可以在phpstudy中检查一下端口是否已经被占用<br>
+<img src="https://boooook123.github.io/Artone.github.io//post-images/1666170170363.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://boooook123.github.io/Artone.github.io/tag/le_ni-jrH/" class="tag">
+                    代码审计
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://boooook123.github.io/Artone.github.io/post/quan-xin-de-kai-shi/">
+                  <h3 class="post-title">
+                    全新的开始
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
